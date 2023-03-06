@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Weather Dashboard</title>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
+	<style>
+		#history-list {
+			list-style: none;
+			padding: 0;
+		}
+
+		#history-list li {
+			cursor: pointer;
+			margin-bottom: 5px;
+		}
+
+		#current-weather, #future-weather {
+			display: none;
+		}
+	</style>
+</head>
+<body>
+	<div class="container mt-3">
+		<h1>Weather Dashboard</h1>
+		<div class="row">
+			<div class="col-md-6">
+				<form>
+					<div class="form-group">
+						<label for="city-input">City:</label>
+						<input type="text" class="form-control" id="city-input" placeholder="Enter city">
+					</div>
+					<button type="submit" class="btn btn-primary">Search</button>
+				</form>
+				<div class="mt-3">
+					<h3>Search History:</h3>
+					<ul id="history-list"></ul>
+				</div>
+			</div>
+			<div class="col-md-6">
+				<div id="current-weather">
+					<h3 id="city-name"></h3>
+					<p id="date"></p>
+					<p id="weather-icon"></p>
+					<p id="temperature"></p>
+					<p id="humidity"></p>
+					<p id="wind-speed"></p>
+				</div>
+				<div id="future-weather">
+					<h3>5-Day Forecast:</h3>
+					<div class="row" id="forecast-row"></div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<script>
+		var apiKey = '553bc79707b85c55169711cf0870ca15';
+		var searchHistory = JSON.parse(localStorage.getItem('searchHistory')) || [];
+        var city;
+
+		// Function to retrieve current weather conditions for a given city
+		function getCurrentWeather(city) {
+			$.ajax({
+				url: `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}&units=imperial`,
+				method: 'GET'
+			}).then(function(response) {
+				console.log(response);
+				$('#current-weather').show();
+				$('#city-name').text(response.name);
+				$('#date').text(moment().format('dddd, MMMM Do YYYY'));
+				$('#weather-icon').html(`<img src="https://openweathermap.org/img/w/${response.weather[0].icon}.png">`);
+				$('#temperature').text(`Temperature: ${response.main.temp} °F`);
+				$('#humidity').text(`Humidity: ${response.main.humidity}%`);
+				$('#wind-speed').text(`Wind Speed: ${response.wind.speed}m/s`);
+                addToHistory(city);
+                getForecast(city);
+                }).catch(function(error) {
+                console.log(error);
+                alert('City not found');
+                });
+        }
+
+        	// Function to retrieve 5-day forecast for a given city
+	function getForecast(city) {
+		$.ajax({
+			url: `https://api.openweathermap.org/data/2.5/forecast?q=${city}&appid=${apiKey}&units=imperial`,
+			method: 'GET'
+		}).then(function(response) {
+			console.log(response);
+			$('#future-weather').show();
+			$('#forecast-row').empty();
+			for (var i = 0; i < response.list.length; i++) {
+				if (response.list[i].dt_txt.includes('12:00:00')) {
+					var forecastCard = $('<div>').addClass('col-md-2');
+					var forecastDate = $('<p>').text(moment(response.list[i].dt_txt).format('MMM Do'));
+					var forecastIcon = $('<p>').html(`<img src="https://openweathermap.org/img/w/${response.list[i].weather[0].icon}.png">`);
+					var forecastTemp = $('<p>').text(`Temp: ${response.list[i].main.temp} °F`);
+					var forecastWind = $('<p>').text(`Wind: ${response.list[i].wind.speed} m/s`);
+					var forecastHumidity = $('<p>').text(`Humidity: ${response.list[i].main.humidity}%`);
+					forecastCard.append(forecastDate, forecastIcon, forecastTemp, forecastWind, forecastHumidity);
+					$('#forecast-row').append(forecastCard);
+				}
+			}
+		}).catch(function(error) {
+			console.log(error);
+		});
+	}
+
+	// Function to add a city to search history
+	function addToHistory(city) {
+		if (!searchHistory.includes(city)) {
+			searchHistory.push(city);
+			localStorage.setItem('searchHistory', JSON.stringify(searchHistory));
+			var historyItem = $('<li>').text(city);
+			$('#history-list').prepend(historyItem);
+		}
+	}
+
+	// Event listener for search form submission
+	$('form').on('submit', function(event) {
+		event.preventDefault();
+		var city = $('#city-input').val().trim();
+		if (city) {
+			getCurrentWeather(city);
+		}
+	});
+
+	// Event listener for clicking a city in search history
+	$(document).on('click', '#history-list li', function() {
+		var city = $(this).text();
+		getCurrentWeather(city);
+	});
+
+	// Populate search history on page load
+	for (var i = 0; i < searchHistory.length; i++) {
+		var historyItem = $('<li>').text(searchHistory[i]);
+		$('#history-list').append(historyItem);
+	}
+    </script>
+</body>
+</html>
