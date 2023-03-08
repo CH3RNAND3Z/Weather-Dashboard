@@ -1,0 +1,15 @@
+        #history-list {
+			list-style: none;
+			padding: 0;
+		}
+
+		#history-list li {
+			cursor: pointer;
+			margin-bottom: 5px;
+		}
+
+		#current-weather, #future-weather {
+			display: none;
+		}
+
+        

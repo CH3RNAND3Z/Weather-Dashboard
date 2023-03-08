@@ -1,64 +1,4 @@
-<!DOCTYPE html>
-<html>
-<head>
-	<title>Weather Dashboard</title>
-	<meta charset="utf-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
-	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
-	<style>
-		#history-list {
-			list-style: none;
-			padding: 0;
-		}
 
-		#history-list li {
-			cursor: pointer;
-			margin-bottom: 5px;
-		}
-
-		#current-weather, #future-weather {
-			display: none;
-		}
-	</style>
-</head>
-<body>
-	<div class="container mt-3">
-		<h1>Weather Dashboard</h1>
-		<div class="row">
-			<div class="col-md-6">
-				<form>
-					<div class="form-group">
-						<label for="city-input">City:</label>
-						<input type="text" class="form-control" id="city-input" placeholder="Enter city">
-					</div>
-					<button type="submit" class="btn btn-primary">Search</button>
-				</form>
-				<div class="mt-3">
-					<h3>Search History:</h3>
-					<ul id="history-list"></ul>
-				</div>
-			</div>
-			<div class="col-md-6">
-				<div id="current-weather">
-					<h3 id="city-name"></h3>
-					<p id="date"></p>
-					<p id="weather-icon"></p>
-					<p id="temperature"></p>
-					<p id="humidity"></p>
-					<p id="wind-speed"></p>
-				</div>
-				<div id="future-weather">
-					<h3>5-Day Forecast:</h3>
-					<div class="row" id="forecast-row"></div>
-				</div>
-			</div>
-		</div>
-	</div>
-	<script>
 		var apiKey = '553bc79707b85c55169711cf0870ca15';
 		var searchHistory = JSON.parse(localStorage.getItem('searchHistory')) || [];
         var city;
@@ -75,8 +15,8 @@
 				$('#date').text(moment().format('dddd, MMMM Do YYYY'));
 				$('#weather-icon').html(`<img src="https://openweathermap.org/img/w/${response.weather[0].icon}.png">`);
 				$('#temperature').text(`Temperature: ${response.main.temp} °F`);
-				$('#humidity').text(`Humidity: ${response.main.humidity}%`);
-				$('#wind-speed').text(`Wind Speed: ${response.wind.speed}m/s`);
+				$('#humidity').text(`Humidity: ${response.main.humidity} %`);
+				$('#wind-speed').text(`Wind Speed: ${response.wind.speed} MPH`);
                 addToHistory(city);
                 getForecast(city);
                 }).catch(function(error) {
@@ -100,8 +40,8 @@
 					var forecastDate = $('<p>').text(moment(response.list[i].dt_txt).format('MMM Do'));
 					var forecastIcon = $('<p>').html(`<img src="https://openweathermap.org/img/w/${response.list[i].weather[0].icon}.png">`);
 					var forecastTemp = $('<p>').text(`Temp: ${response.list[i].main.temp} °F`);
-					var forecastWind = $('<p>').text(`Wind: ${response.list[i].wind.speed} m/s`);
-					var forecastHumidity = $('<p>').text(`Humidity: ${response.list[i].main.humidity}%`);
+					var forecastWind = $('<p>').text(`Wind: ${response.list[i].wind.speed} MPH`);
+					var forecastHumidity = $('<p>').text(`Humidity: ${response.list[i].main.humidity} %`);
 					forecastCard.append(forecastDate, forecastIcon, forecastTemp, forecastWind, forecastHumidity);
 					$('#forecast-row').append(forecastCard);
 				}
@@ -141,6 +81,4 @@
 		var historyItem = $('<li>').text(searchHistory[i]);
 		$('#history-list').append(historyItem);
 	}
-    </script>
-</body>
-</html>
+    
