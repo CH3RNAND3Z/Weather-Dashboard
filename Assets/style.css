@@ -6,10 +6,29 @@
 		#history-list li {
 			cursor: pointer;
 			margin-bottom: 5px;
+            background-color: lightgray;
 		}
 
-		#current-weather, #future-weather {
-			display: none;
-		}
-
+		#current-weather {
+            display: none;
+            outline: auto;
+            outline-color: black;
+            outline-style: groove;
+            text-align: center;
+        }
         
+        #future-weather {
+			display: none;
+            background-color: grey;
+            color: white;
+            outline: auto;
+            outline-color: black;
+            outline-style: groove;
+            text-align: center;
+		}
+
+        h1 {
+            background-color: blue;
+            color: white;
+            text-align: center;
+        }
